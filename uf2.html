@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pack de Estudio - Procesos e Hilos en Java</title>
+    <!-- Estilos reutilizados de la plantilla de Criptografía -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .tab-button:hover {
+            background: #e5e7eb;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #0d7865;
+            box-shadow: 0 4px 12px rgba(67, 233, 123, 0.4);
+        }
+        
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 500px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* FLASHCARDS */
+        .flashcard-container {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .flashcard-counter {
+            color: #6b7280;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .flashcard {
+            perspective: 1000px;
+            height: 350px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+        
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .flashcard-front {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #0d7865;
+        }
+        
+        .flashcard-back {
+            background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);
+            color: white;
+            transform: rotateY(180deg);
+        }
+        
+        .flashcard-text {
+            font-size: 1.5em;
+            font-weight: 600;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        
+        .flashcard-hint {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 15px;
+        }
+        
+        .flashcard-navigation {
+            display: flex;
+            justify-content: space-between;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .nav-button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #6b7280;
+            color: white;
+        }
+        
+        .nav-button:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        /* TABLES */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+        
+        .status-obsolete {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        .status-secure {
+            color: #059669;
+            font-weight: 600;
+        }
+        
+        .status-warning {
+            color: #d97706;
+            font-weight: 600;
+        }
+        
+        /* BOXES */
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .danger-box {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .card h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        /* CODE */
+        .code-block {
+            background: #1f2937;
+            color: #d1fae5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .code-block .comment {
+            color: #6b7280;
+            font-style: italic;
+        }
+        .code-block .keyword {
+            color: #f857a6; 
+        }
+        .code-block .method {
+            color: #38f9d7;
+        }
+        
+        /* QUESTIONS */
+        .question {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .question h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            margin-top: 15px;
+        }
+        
+        .option {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            border-color: #43e97b;
+            background: #f3f4f6;
+        }
+        
+        .option.selected {
+            border-color: #43e97b;
+            background: #eef2ff;
+        }
+        
+        .option.correct {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .option.incorrect {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        /* PROCESS STEPS */
+        .process-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+        }
+        
+        .step-number {
+            background: #43e97b;
+            color: #0d7865;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            color: #0d7865;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .footer h3 {
+            margin-bottom: 15px;
+        }
+        
+        .footer ul {
+            list-style: none;
+        }
+        
+        .footer li {
+            padding: 5px 0;
+        }
+
+        /* TEST RESULT */
+        .test-result {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .test-result h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .test-result.fail {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(248, 87, 166, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Pack de Estudio: Concurrencia</h1>
+            <p style="color: #6b7280; font-size: 1.1em;">Procesos e Hilos en Java - Preparación del Examen</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('test')">✅ Test General</button>
+            <button class="tab-button" onclick="showTab('flashcards')">📖 Flashcards</button>
+            <button class="tab-button" onclick="showTab('schemas')">🗺️ Esquemas</button>
+            <button class="tab-button" onclick="showTab('cheatsheet')">📄 Cheat Sheet</button>
+            <button class="tab-button" onclick="showTab('code')">💻 Código</button>
+            <button class="tab-button" onclick="showTab('practical')">🎯 Casos Prácticos</button>
+        </div>
+        
+        <div class="content">
+            <!-- TEST GENERAL TAB -->
+            <div id="test" class="tab-content active">
+                <div class="info-box">
+                    <strong>Test General de Concurrencia</strong><br>
+                    15 preguntas tipo test sobre todo el temario. Selecciona la respuesta correcta en cada pregunta.
+                </div>
+                
+                <div id="test-questions"></div>
+                
+                <button class="submit-button" onclick="submitTest()">Ver Resultados</button>
+                
+                <div id="test-result" style="display: none;"></div>
+            </div>
+
+            <!-- FLASHCARDS TAB -->
+            <div id="flashcards" class="tab-content">
+                <div class="flashcard-container">
+                    <div class="flashcard-counter">
+                        Tarjeta <span id="current-card">1</span> de <span id="total-cards">20</span>
+                    </div>
+                    <div class="flashcard" id="flashcard" onclick="flipCard()">
+                        <div class="flashcard-inner" id="flashcard-inner">
+                            <div class="flashcard-front">
+                                <div>
+                                    <div class="flashcard-text" id="card-front"></div>
+                                    <div class="flashcard-hint">Haz clic para ver la respuesta</div>
+                                </div>
+                            </div>
+                            <div class="flashcard-back">
+                                <div>
+                                    <div class="flashcard-text" id="card-back"></div>
+                                    <div class="flashcard-hint">Haz clic para volver</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flashcard-navigation">
+                        <button class="nav-button" onclick="prevCard()">← Anterior</button>
+                        <button class="nav-button" onclick="nextCard()">Siguiente →</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SCHEMAS TAB -->
+            <div id="schemas" class="tab-content">
+                <h2 style="color: #1f2937; margin-bottom: 25px;">🖥️ Proceso vs. Hilo (Thread)</h2>
+                <div class="grid">
+                    <div class="card" style="border-left: 4px solid #f857a6;">
+                        <h3>PROCESO</h3>
+                        <p style="margin-bottom: 10px;">Instancia de un programa en ejecución.</p>
+                        <ul style="list-style: none; line-height: 1.8;">
+                            <li>✓ <strong>Memoria Propia:</strong> Stack y Heap aislados.</li>
+                            <li>✓ <strong>Aislado:</strong> Un fallo no afecta a otros procesos.</li>
+                            <li>✗ <strong>Pesado:</strong> Lento para crear y comunicar.</li>
+                        </ul>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e5e7eb;">
+                        <p><strong>Ejemplo:</strong> Abrir dos instancias de Notepad (dos procesos).</p>
+                    </div>
+                    
+                    <div class="card" style="border-left: 4px solid #43e97b;">
+                        <h3>HILO (Thread)</h3>
+                        <p style="margin-bottom: 10px;">Unidad de ejecución dentro de un proceso.</p>
+                        <ul style="list-style: none; line-height: 1.8;">
+                            <li>✓ <strong>Memoria Compartida:</strong> Mismo Heap, Stack propio.</li>
+                            <li>✗ <strong>No Aislado:</strong> Un fallo afecta a todo el proceso.</li>
+                            <li>✓ <strong>Ligero:</strong> Rápido para crear y comunicar.</li>
+                        </ul>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #e5e7eb;">
+                        <p><strong>Ejemplo:</strong> Escribir texto (hilo UI) y guardar (hilo de fondo) en un solo Notepad.</p>
+                    </div>
+                </div>
+                
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">🔄 Ciclo de Vida de un Hilo</h2>
+                <div class="process-step">
+                    <div class="step-number" style="background: #e5e7eb; color: #374151;">1</div>
+                    <div class="step-content">
+                        <strong>NEW:</strong> `Thread t = new Thread();`<br>
+                        El objeto existe, pero el S.O. no sabe nada de él.
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>RUNNABLE:</strong> `t.start();`<br>
+                        El hilo está en la cola del planificador, listo para ejecutarse.
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number" style="background: #e5e7eb; color: #374151;">3</div>
+                    <div class="step-content" style="background: #fef3c7;">
+                        <strong>RUNNING:</strong> (Subestado de RUNNABLE)<br>
+                        El hilo está actualmente usando la CPU.
+                    </div>
+                </div>
+                
+                <h3 style="color: #1f2937; margin: 30px 0 15px;">Estados de No Ejecución (Not Runnable)</h3>
+                <div class="grid">
+                    <div class="card" style="border-left: 4px solid #ef4444;">
+                        <h3>BLOCKED</h3>
+                        <p>El hilo intenta entrar en un bloque `synchronized` pero otro hilo ya tiene el candado (monitor lock).</p>
+                        <p style="margin-top: 10px;"><strong>Vuelta a RUNNABLE:</strong> Cuando el candado es liberado.</p>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #f59e0b;">
+                        <h3>WAITING</h3>
+                        <p>El hilo ha llamado a `objeto.wait()` o `hilo.join()` (sin tiempo).</p>
+                        <p style="margin-top: 10px;"><strong>Vuelta a RUNNABLE:</strong> Cuando es notificado (`notify()` / `notifyAll()`) o el hilo de `join()` muere.</p>
+                    </div>
+                     <div class="card" style="border-left: 4px solid #3b82f6;">
+                        <h3>TIMED_WAITING</h3>
+                        <p>El hilo ha llamado a `Thread.sleep(ms)`, `objeto.wait(ms)` o `hilo.join(ms)`.</p>
+                        <p style="margin-top: 10px;"><strong>Vuelta a RUNNABLE:</strong> Cuando el tiempo expira o es notificado.</p>
+                    </div>
+                </div>
+                
+                <div class="process-step" style="margin-top: 30px;">
+                    <div class="step-number" style="background: #1f2937; color: white;">4</div>
+                    <div class="step-content" style="background: #e5e7eb;">
+                        <strong>TERMINATED:</strong> El método `run()` finaliza (normalmente o por excepción).<br>
+                        El hilo ha muerto y no puede volver a iniciarse.
+                    </div>
+                </div>
+                
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">🔒 Sincronización: Problema y Solución</h2>
+                 <div class="grid">
+                    <div class="card" style="border-left: 4px solid #ef4444;">
+                        <h3>PROBLEMA: Condición de Carrera</h3>
+                        <p style="margin-bottom: 10px;">Varios hilos leen y escriben en un recurso compartido (ej: `saldo`) al mismo tiempo.</p>
+                        <div class="code-block" style="background: #374151; color: #fee2e2;">
+                            <span class="comment">// saldo = 100</span><br>
+                            Hilo A lee (100)<br>
+                            Hilo B lee (100)<br>
+                            Hilo A escribe (101)<br>
+                            Hilo B escribe (101) <span class="comment">// ¡Depósito perdido!</span>
+                        </div>
+                        <p style="font-weight: bold; color: #dc2626;">Resultado: Datos corruptos e impredecibles.</p>
+                    </div>
+                    
+                    <div class="card" style="border-left: 4px solid #10b981;">
+                        <h3>SOLUCIÓN: `synchronized`</h3>
+                        <p style="margin-bottom: 10px;">Crea una "sección crítica" o "monitor lock". Solo un hilo puede entrar a la vez.</p>
+                         <div class="code-block" style="background: #374151; color: #d1fae5;">
+                            <span class="keyword">public synchronized void</span> <span class="method">depositar</span>() {<br>
+                                <span class="comment">// Hilo A entra y bloquea</span><br>
+                                saldo = saldo + 1;<br>
+                                <span class="comment">// Hilo B espera (BLOCKED)</span><br>
+                            } <span class="comment">// Hilo A sale y libera</span>
+                        </div>
+                        <p style="font-weight: bold; color: #059669;">Resultado: Operación atómica y datos consistentes.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CHEAT SHEET TAB -->
+            <div id="cheatsheet" class="tab-content">
+                <h2 style="color: #1f2937; margin-bottom: 25px;">📄 Métodos Clave de `Thread`</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Descripción</th>
+                            <th>Contexto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><code>.start()</code></strong></td>
+                            <td>Inicia el hilo. Llama a <code>run()</code> en un nuevo hilo de ejecución.</td>
+                            <td class="status-secure">✅ OBLIGATORIO</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.run()</code></strong></td>
+                            <td>Contiene el código que ejecutará el hilo. (No llamar directamente).</td>
+                            <td>Implementar (Runnable) / Sobrescribir (Thread)</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.join()</code></strong></td>
+                            <td>El hilo actual espera (se bloquea) hasta que el hilo <code>t</code> termine.</td>
+                            <td class="status-warning">Coordinación</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.sleep(ms)</code></strong></td>
+                            <td>Pausa el hilo actual por 'ms' milisegundos. (Estado TIMED_WAITING).</td>
+                            <td>Simulación / Pausa</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.interrupt()</code></strong></td>
+                            <td>Envía una señal de interrupción al hilo.</td>
+                            <td class="status-warning">Detención / Señalización</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.isAlive()</code></strong></td>
+                            <td>Devuelve <code>true</code> si el hilo ha iniciado y no ha terminado.</td>
+                            <td>Verificación</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>Thread.currentThread()</code></strong></td>
+                            <td>Método estático. Devuelve la instancia del hilo actual.</td>
+                            <td>Utilidad</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">🤝 Sincronización y Comunicación (Clase `Object`)</h2>
+                 <table>
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Descripción</th>
+                            <th>Contexto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><code>synchronized</code></strong> (bloque/método)</td>
+                            <td>Adquiere el candado (monitor lock) del objeto. Previene Condiciones de Carrera.</td>
+                            <td class="status-secure">Atomicidad</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.wait()</code></strong></td>
+                            <td>Libera el candado y pone al hilo en estado WAITING (suspensión pasiva).</td>
+                            <td class="status-warning">Productor-Consumidor</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.notify()</code></strong></td>
+                            <td>Despierta a UN hilo aleatorio que esté en <code>wait()</code> sobre ese objeto.</td>
+                            <td class="status-warning">Productor-Consumidor</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>.notifyAll()</code></strong></td>
+                            <td>Despierta a TODOS los hilos que estén en <code>wait()</code> sobre ese objeto.</td>
+                            <td class="status-secure">✅ RECOMENDADO</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">⚖️ Comparativa de Estados de Espera</h2>
+                <div class="grid">
+                    <div class="card" style="border-left: 4px solid #ef4444;">
+                        <h3>BLOCKED</h3>
+                        <p><strong>Causa:</strong> Intentar entrar en un bloque `synchronized` que ya está ocupado.</p>
+                        <p><strong>Cómo sale:</strong> Automáticamente, cuando el otro hilo libera el candado.</p>
+                        <p><strong>Control:</strong> El programador no lo controla, es automático del monitor lock.</p>
+                    </div>
+                    
+                    <div class="card" style="border-left: 4px solid #f59e0b;">
+                        <h3>WAITING</h3>
+                        <p><strong>Causa:</strong> Llamada explícita a `objeto.wait()` o `hilo.join()`.</p>
+                        <p><strong>Cómo sale:</strong> Llamada explícita a `objeto.notify()` o `notifyAll()` desde otro hilo.</p>
+                        <p><strong>Control:</strong> El programador lo controla para la comunicación entre hilos.</p>
+                    </div>
+                </div>
+                
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">🖥️ Métodos Clave de `Process` y `ProcessBuilder`</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong><code>ProcessBuilder(cmd)</code></strong></td>
+                            <td>Configura el comando a ejecutar (ej: "notepad.exe" o "cmd", "/c", "echo").</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>builder.inheritIO()</code></strong></td>
+                            <td>Redirige la salida del proceso hijo a la consola del padre.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>builder.start()</code></strong></td>
+                            <td>Inicia el proceso externo y devuelve un objeto <code>Process</code>.</td>
+                        </tr>
+                         <tr>
+                            <td><strong><code>process.waitFor()</code></strong></td>
+                            <td>Bloquea el hilo actual (Java) hasta que el proceso externo termine.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>process.exitValue()</code></strong></td>
+                            <td>Devuelve el código de salida del proceso (0 = éxito). Solo usar después de <code>waitFor()</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong><code>process.getInputStream()</code></strong></td>
+                            <td>Obtiene el stream para LEER la SALIDA del proceso externo.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2 style="color: #1f2937; margin: 40px 0 25px;">⚠️ IMPORTANTE - Errores Comunes</h2>
+                <div class="danger-box">
+                    <ul style="list-style: none; line-height: 2;">
+                        <li><strong>• Error:</strong> Llamar a `hilo.run()` en lugar de `hilo.start()`.<br><strong>Causa:</strong> Ejecuta el código en el hilo principal, no en uno nuevo.</li>
+                        <li><strong>• Error:</strong> Usar `if(lista.isEmpty()) wait();` en lugar de `while(...)`.<br><strong>Causa:</strong> Vulnerable a "Spurious Wakeups" (despertares falsos).</li>
+                        <li><strong>• Error:</strong> Llamar a `wait()` o `notify()` fuera de un bloque `synchronized`.<br><strong>Causa:</strong> Lanza `IllegalMonitorStateException`.</li>
+                        <li><strong>• Error:</strong> Usar `Thread.sleep()` para sincronizar (espera activa).<br><strong>Causa:</strong> Ineficiente y poco fiable. Usar `wait()`/`notify()`.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- CODE TAB -->
+            <div id="code" class="tab-content">
+                <div class="info-box">
+                    <strong>Instrucciones:</strong> Lee cada fragmento de código (basado en nuestros ejercicios) y responde a la pregunta.
+                </div>
+                
+                <div id="code-questions"></div>
+                
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%); padding: 25px; border-radius: 12px; margin-top: 30px;">
+                    <h3 style="color: #f857a6; margin-bottom: 15px;">💡 Consejos para código:</h3>
+                    <ul style="line-height: 1.8;">
+                        <li>• `start()` crea un hilo, `run()` no.</li>
+                        <li>• `synchronized` protege datos compartidos.</li>
+                        <li>• `join()` espera a que un hilo muera.</li>
+                        <li>• `wait()` libera el candado, `sleep()` no lo hace.</li>
+                        <li>• `process.getInputStream()` es la SALIDA del proceso externo.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- PRACTICAL TAB -->
+            <div id="practical" class="tab-content">
+                <div class="success-box">
+                    <strong>Instrucciones:</strong> Lee cada caso práctico y elige la mejor solución. Después de responder verás la explicación.
+                </div>
+                
+                <div id="practical-cases"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>🚀 Estrategia para el examen:</h3>
+            <ul>
+                <li>✓ Haz el test general primero para evaluar tu nivel</li>
+                <li>✓ Repasa las flashcards varias veces</li>
+                <li>✓ Entiende la diferencia entre BLOCKED y WAITING (Cheat Sheet)</li>
+                <li>✓ Practica identificar el error en `hilo.run()` (Test de Código)</li>
+                <li>✓ Entiende CUÁNDO usar `synchronized` vs `wait()` (Casos Prácticos)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // TEST GENERAL - 15 PREGUNTAS
+        const testQuestions = [
+            { id: 1, question: "¿Cuál es la diferencia clave entre un Proceso y un Hilo?", options: ["El Hilo es más rápido", "El Proceso no puede fallar", "Los Hilos comparten memoria (Heap), los Procesos no", "Los Procesos usan .start() y los Hilos .run()"], correct: 2 },
+            { id: 2, question: "¿Qué método se debe usar para iniciar la ejecución de un nuevo hilo?", options: [".run()", ".start()", ".init()", ".execute()"], correct: 1 },
+            { id: 3, question: "Si llamas a hilo.run() directamente, ¿qué ocurre?", options: ["Se lanza una excepción", "El código se ejecuta en un nuevo hilo", "El código se ejecuta en el hilo principal (actual)", "El hilo se bloquea"], correct: 2 },
+            { id: 4, question: "¿Qué problema previene la palabra clave 'synchronized'?", options: ["Deadlocks", "InterruptedException", "Condiciones de Carrera (Race Conditions)", "Procesos zombie"], correct: 2 },
+            { id: 5, question: "¿Qué hace el método hilo.join()?", options: ["Une dos hilos en uno solo", "Pausa el hilo 'hilo'", "Hace que el hilo actual espere a que 'hilo' termine", "Interrumpe a 'hilo'"], correct: 2 },
+            { id: 6, question: "¿Qué clase se usa para crear y configurar procesos externos del S.O.?", options: ["Thread", "Process", "ProcessBuilder", "Runnable"], correct: 2 },
+            { id: 7, question: "¿Qué hace el método process.waitFor()?", options: ["Espera a que el proceso tenga un error", "Pausa el proceso externo", "Bloquea el hilo de Java hasta que el proceso externo termine", "Espera un tiempo aleatorio"], correct: 2 },
+            { id: 8, question: "Para leer la salida de un proceso externo, usamos:", options: ["process.getOutputStream()", "process.getInputStream()", "process.getReader()", "process.getExitValue()"], correct: 1 },
+            { id: 9, question: "En el patrón Productor-Consumidor, si el buffer está LLENO, el Productor debe llamar a:", options: [".wait()", ".notify()", ".sleep()", ".interrupt()"], correct: 0 },
+            { id: 10, question: "En el patrón Productor-Consumidor, si el buffer está VACÍO, el Consumidor debe llamar a:", options: [".wait()", ".notify()", ".join()", ".sleep()"], correct: 0 },
+            { id: 11, question: "Error: Llamar a .wait() o .notify() fuera de un bloque 'synchronized' lanza:", options: ["NullPointerException", "InterruptedException", "IllegalMonitorStateException", "RuntimeException"], correct: 2 },
+            { id: 12, question: "¿Cuál es la diferencia entre .wait() y .sleep()?", options: [".wait() libera el candado (monitor lock), .sleep() no lo hace", ".sleep() es más rápido que .wait()", ".wait() es para Procesos, .sleep() para Hilos", "No hay diferencia"], correct: 0 },
+            { id: 13, question: "Un hilo entra en estado BLOCKED cuando:", options: ["Llama a .sleep()", "Llama a .wait()", "Intenta entrar a un 'synchronized' ya ocupado", "Termina su método .run()"], correct: 2 },
+            { id: 14, question: "Un hilo entra en estado WAITING cuando:", options: ["Llama a .sleep(5000)", "Llama a .wait() o .join()", "Falla una operación de I/O", "Intenta entrar a un 'synchronized' ya ocupado"], correct: 1 },
+            { id: 15, question: "El método recomendado para despertar hilos en espera es:", options: [".notify()", ".notifyAll()", ".interrupt()", ".resume()"], correct: 1 }
+        ];
+
+        // FLASHCARDS DATA
+        const flashcards = [
+            { front: "Proceso", back: "Instancia de un programa en ejecución. Tiene su propio espacio de memoria aislado (Heap y Stack)." },
+            { front: "Hilo (Thread)", back: "Unidad de ejecución dentro de un proceso. Comparte la memoria (Heap) con otros hilos del mismo proceso." },
+            { front: "Diferencia Clave: Memoria", back: "Procesos: Memoria separada (pesados, seguros).\nHilos: Memoria compartida (ligeros, rápidos, riesgo de concurrencia)." },
+            { front: "Concurrencia", back: "Múltiples tareas progresan al mismo tiempo, pero no necesariamente ejecutándose simultáneamente (ej: intercalado en una CPU)." },
+            { front: "Paralelismo", back: "Múltiples tareas se ejecutan *exactamente* al mismo tiempo (ej: en diferentes núcleos de CPU)." },
+            { front: "Crear Hilos (Opción 1)", back: "Implementar la interfaz `Runnable` y pasarla a un `new Thread(runnable)`.\n(Preferido, permite heredar de otra clase)." },
+            { front: "Crear Hilos (Opción 2)", back: "Extender la clase `Thread` y sobrescribir el método `run()`.\n(Menos flexible, bloquea la herencia)." },
+            { front: "start() vs run()", back: "`start()`: Inicia un nuevo hilo y llama a `run()`.\n`run()`: Ejecuta el código en el hilo actual (¡ERROR COMÚN!)." },
+            { front: "Condición de Carrera (Race Condition)", back: "Error que ocurre cuando múltiples hilos acceden y modifican datos compartidos, y el resultado final depende del orden (aleatorio) en que se ejecutan." },
+            { front: "`synchronized`", back: "Palabra clave que crea un 'candado' (monitor lock). Solo un hilo a la vez puede ejecutar un método o bloque sincronizado sobre el mismo objeto." },
+            { front: "`process.waitFor()`", back: "Bloquea el hilo de Java (actual) hasta que el proceso externo (`Process`) termine su ejecución." },
+            { front: "`process.exitValue()`", back: "Devuelve el código de salida del proceso externo (0 = éxito). Solo se debe llamar DESPUÉS de `waitFor()`." },
+            { front: "`hilo.join()`", back: "Bloquea el hilo actual (ej: main) hasta que `hilo` (otro hilo) termine su método `run()`." },
+            { front: "`hilo.interrupt()`", back: "Envía una señal de interrupción al hilo. Si el hilo está en `sleep()`, `wait()` o `join()`, lanza `InterruptedException`." },
+            { front: "Estado: NEW", back: "El objeto `Thread` ha sido creado (`new Thread()`), pero `start()` aún no ha sido llamado." },
+            { front: "Estado: RUNNABLE", back: "El hilo está listo para ejecutarse y está en la cola del planificador del S.O. (Incluye el estado 'Running')." },
+            { front: "Estado: BLOCKED", back: "El hilo está bloqueado porque espera entrar a un bloque `synchronized` cuyo candado está ocupado por otro hilo." },
+            { front: "Estado: WAITING", back: "El hilo está suspendido pasivamente. Ha llamado a `wait()` o `join()` (sin tiempo)." },
+            { front: "Estado: TIMED_WAITING", back: "El hilo está suspendido por un tiempo. Ha llamado a `sleep(ms)`, `wait(ms)` o `join(ms)`." },
+            { front: "`wait()` vs `sleep()`", back: "`wait()`: Libera el candado `synchronized` y se suspende (WAITING).\n`sleep()`: Mantiene el candado `synchronized` y se suspende (TIMED_WAITING)." }
+        ];
+        
+        // CODE QUESTIONS
+        const codeQuestions = [
+            {
+                id: 1,
+                question: "En `ProcesoSecuencialCondicional`, ¿qué hace `pSuccess.waitFor()`?",
+                code: `// ...
+        pSuccess = new ProcessBuilder(cmdSuccess).start();
+        int exitCode = pSuccess.waitFor();
+        if (exitCode == 0) {
+          // ...
+        }`,
+                options: [
+                    "Pausa el proceso 'pSuccess' por un segundo",
+                    "Bloquea el hilo de Java hasta que 'pSuccess' termine, y devuelve su código de salida",
+                    "Espera a que 'pSuccess' falle",
+                    "Inicia el proceso 'pSuccess'"
+                ],
+                correct: 1,
+                explanation: "waitFor() es crucial para la ejecución secuencial. Bloquea el hilo de Java (main) hasta que el proceso externo (pSuccess) finaliza, permitiéndonos leer su exitValue()."
+            },
+            {
+                id: 2,
+                question: "En `ProcesoCapturaSalida`, ¿qué stream usamos para LEER la SALIDA del proceso externo?",
+                code: `Process pingProcess = builder.start();
+        try (BufferedReader reader = new BufferedReader(
+             new InputStreamReader(pingProcess.getInputStream()))) {
+            while ((line = reader.readLine()) != null) {
+              System.out.println(line);
+            }
+        }`,
+                options: [
+                    "pingProcess.getOutputStream()",
+                    "pingProcess.getErrorStream()",
+                    "pingProcess.getInputStream()",
+                    "System.in"
+                ],
+                correct: 2,
+                explanation: "Es confuso pero clave: La 'Salida' (Output) del proceso externo es la 'Entrada' (Input) para nuestro programa Java. Por eso leemos de getInputStream()."
+            },
+            {
+                id: 3,
+                question: "En `HiloSincronizacion`, ¿por qué el resultado SIN `synchronized` es incorrecto?",
+                code: `public void depositarNoSincronizado(int c) {
+            saldo = saldo + c;
+        }`,
+                options: [
+                    "Porque la operación 'saldo = saldo + c' no es atómica, causando una Condición de Carrera",
+                    "Porque los hilos son demasiado lentos",
+                    "Porque el tipo 'int' no soporta concurrencia",
+                    "Porque 'saldo' debería ser 'static'"
+                ],
+                correct: 0,
+                explanation: "La operación 'saldo = saldo + c' requiere 3 pasos (Leer-Modificar-Escribir). Si los hilos se intercalan, un hilo puede sobrescribir el trabajo del otro, perdiendo datos."
+            },
+            {
+                id: 4,
+                question: "En `HiloCoordinacionInterrupcion`, ¿qué ocurre si `hiloC.interrupt()` se llama mientras `hiloC` está en `Thread.sleep()`?",
+                code: `public void run() {
+            try {
+                Thread.sleep(10000); 
+            } catch (InterruptedException e) {
+                System.out.println("¡Fui interrumpido!");
+            }
+        }`,
+                options: [
+                    "El hilo ignora la interrupción y sigue durmiendo",
+                    "Se lanza una InterruptedException inmediatamente y el hilo se despierta",
+                    "El hilo se termina bruscamente (muere)",
+                    "Se lanza una IllegalMonitorStateException"
+                ],
+                correct: 1,
+                explanation: "Llamar a .interrupt() sobre un hilo en estado TIMED_WAITING (como sleep) o WAITING (como wait) fuerza una InterruptedException para despertarlo."
+            },
+            {
+                id: 5,
+                question: "En `ProductorConsumidor`, ¿por qué es crucial usar `while(lista.size() == capacidad)` en lugar de `if`?",
+                code: `synchronized (this) {
+            while (lista.size() == capacidad) {
+                wait();
+            }
+            // ... producir ...
+        }`,
+                options: [
+                    "Es más rápido que un 'if'",
+                    "Para proteger contra 'Spurious Wakeups' (despertares falsos)",
+                    "Porque 'if' no funciona dentro de 'synchronized'",
+                    "Para contar el número de esperas"
+                ],
+                correct: 1,
+                explanation: "Un hilo puede despertarse de wait() sin haber sido notificado (spurious wakeup). Usar 'while' asegura que la condición (buffer lleno) se vuelva a comprobar antes de continuar."
+            },
+            {
+                id: 6,
+                question: "¿Cuál es el error en este código?",
+                code: `MiRunnable r = new MiRunnable();
+        Thread t = new Thread(r);
+        t.run(); // ¿Es esto correcto?`,
+                options: [
+                    "El código se ejecutará en el hilo principal, no en un nuevo hilo",
+                    "Lanzará una NullPointerException",
+                    "El hilo 't' se iniciará correctamente",
+                    "Debería ser 'new Thread(t)'"
+                ],
+                correct: 0,
+                explanation: "¡El error clásico! t.run() solo ejecuta el método run() en el hilo actual. Para iniciar un nuevo hilo de ejecución, siempre se debe llamar a t.start()."
+            },
+            {
+                id: 7,
+                question: "En el contexto de sincronización, ¿qué ventaja ofrece `ReentrantLock` sobre la palabra clave `synchronized`?",
+                code: `Lock lock = new ReentrantLock();
+        lock.lock();
+        try {
+            // Sección crítica
+        } finally {
+            lock.unlock();
+        }`,
+                options: [
+                    "Permite el uso de `wait()` y `notify()` de forma más sencilla",
+                    "Permite intentar adquirir el candado (`tryLock()`) y adquirirlo de forma interrumpible",
+                    "Es una implementación de exclusión mutua que no requiere un bloque `try-finally`",
+                    "Es automáticamente recursivo y más eficiente en todos los escenarios"
+                ],
+                correct: 1,
+                explanation: "ReentrantLock ofrece flexibilidad que synchronized no tiene, como la capacidad de probar si se puede adquirir el candado (`tryLock()`), adquirirlo con tiempo límite, o adquirirlo de forma interrumpible (`lockInterruptibly()`)."
+            },
+            {
+                id: 8,
+                question: "En `ProcessBuilder`, ¿qué comando se utiliza para fusionar el flujo de error (stderr) del proceso hijo con su flujo de salida normal (stdout)?",
+                code: `ProcessBuilder builder = new ProcessBuilder(cmd);
+        builder.???;
+        Process p = builder.start();
+        // Leer de p.getInputStream() contendrá tanto stdout como stderr`,
+                options: [
+                    "builder.redirectOutput(Redirect.INHERIT)",
+                    "builder.redirectErrorStream(true)",
+                    "builder.redirectError(Redirect.PIPE)",
+                    "builder.inheritIO()"
+                ],
+                correct: 1,
+                explanation: "builder.redirectErrorStream(true) fusiona la salida de error (stderr) con la salida normal (stdout) del proceso hijo. Esto permite que ambos streams se lean desde process.getInputStream()."
+            },
+            {
+                id: 9,
+                question: "¿Qué sucede internamente y qué garantiza la llamada al método `t.start()` en un objeto `Thread`?",
+                code: `MiRunnable r = new MiRunnable();
+        Thread t = new Thread(r);
+        t.start();`,
+                options: [
+                    "Ejecuta `run()` en el hilo principal (`main`)",
+                    "Crea y registra un nuevo hilo de ejecución del sistema operativo, el cual invoca el método `run()`",
+                    "Solo establece la variable de estado del hilo a `RUNNING`",
+                    "Se utiliza para bloquear la ejecución del hilo principal"
+                ],
+                correct: 1,
+                explanation: "La función clave de start() es iniciar un nuevo hilo de ejecución en el sistema operativo, permitiendo que el método run() de ese hilo se ejecute en paralelo con el hilo que llamó a start()."
+            },
+            {
+                id: 10,
+                question: "¿Cuál es el propósito principal de la palabra clave `volatile` en una variable compartida por varios hilos?",
+                code: `private volatile boolean running = true;`,
+                options: [
+                    "Garantizar que las operaciones de Lectura-Modificación-Escritura sean atómicas",
+                    "Asegurar la *visibilidad* de la variable (que la lectura vaya siempre a la memoria principal)",
+                    "Es un reemplazo directo de la palabra clave `synchronized`",
+                    "Prevenir que la variable sea serializada"
+                ],
+                correct: 1,
+                explanation: "volatile resuelve problemas de visibilidad, garantizando que el valor más reciente de la variable sea leído de la memoria principal y no de una caché local del procesador (o hilo). No garantiza atomicidad."
+            }
+        ];   
+        
+        // PRACTICAL CASES
+        const practicalCases = [
+            {
+                id: 1,
+                scenario: "Necesitas ejecutar un script de Python (`script.py`) y asegurarte de que tu programa Java no continúe hasta que el script termine.",
+                options: [
+                    "Usar `Thread.sleep(5000)` y esperar que termine",
+                    "Usar `ProcessBuilder` para iniciar el script y luego llamar a `process.waitFor()`",
+                    "Usar un `Thread` normal, ya que se ejecutan en Python",
+                    "Usar `process.join()`"
+                ],
+                correct: 1,
+                explanation: "ProcessBuilder es para ejecutar comandos externos. process.waitFor() bloquea el hilo de Java hasta que el proceso externo (el script) finaliza."
+            },
+            {
+                id: 2,
+                scenario: "En una aplicación de escritorio, el usuario presiona un botón para cargar datos de una red, pero la UI se congela.",
+                options: [
+                    "Usar `ProcessBuilder` para cargar los datos",
+                    "Pedir al usuario que espere",
+                    "Ejecutar la carga de red en un nuevo `Thread` (hilo trabajador)",
+                    "Usar `synchronized` en el botón"
+                ],
+                correct: 2,
+                explanation: "Las tareas largas (red, I/O) nunca deben ejecutarse en el Hilo de UI (EDT). Al moverlas a un nuevo Thread, la UI sigue respondiendo."
+            },
+            {
+                id: 3,
+                scenario: "Tienes 10 hilos que actualizan un contador global (`int contador`). El resultado final es incorrecto.",
+                options: [
+                    "Usar `AtomicInteger` o un método `synchronized` para incrementar el contador",
+                    "Usar `ProcessBuilder`",
+                    "Usar `hilo.join()` en cada incremento",
+                    "Usar `hilo.interrupt()`"
+                ],
+                correct: 0,
+                explanation: "Esto es una Condición de Carrera. La solución es hacer la operación de incremento 'atómica', usando synchronized o clases atómicas (AtomicInteger)."
+            },
+            {
+                id: 4,
+                scenario: "Un hilo (Consumidor) debe esperar a que otro hilo (Productor) genere una lista de datos antes de poder procesarla.",
+                options: [
+                    "Usar `ProcessBuilder`",
+                    "Usar `synchronized` en la lista y que el Consumidor llame a `wait()` y el Productor a `notifyAll()`",
+                    "Que el Consumidor use un bucle `while(true)` con `Thread.sleep(100)` (espera activa)",
+                    "Usar `hilo.join()`"
+                ],
+                correct: 1,
+                explanation: "Este es el caso de uso perfecto para wait()/notify(). El Consumidor se suspende (wait) y libera el candado, permitiendo al Productor entrar, producir y notificar."
+            },
+            {
+                id: 5,
+                scenario: "Tu programa Java debe ejecutar un comando (`cmd /c dir`) y mostrar la salida de ese comando en la consola de Java.",
+                options: [
+                    "Usar `builder.start()` y luego `process.getInputStream()` para leer la salida",
+                    "Usar `builder.start()` y luego `process.getOutputStream()` para leer la salida",
+                    "Usar `Thread.sleep()` y esperar que aparezca",
+                    "Usar `builder.inheritIO()` antes de `start()`"
+                ],
+                correct: 3,
+                explanation: "La forma más fácil de redirigir la salida del proceso hijo a la consola del padre es builder.inheritIO(). (Leer getInputStream() también es correcto, pero más complejo)."
+            },
+            {
+                id: 6,
+                scenario: "El hilo 'main' debe procesar los resultados de 4 hilos trabajadores. 'main' no puede continuar hasta que los 4 hayan terminado.",
+                options: [
+                    "Llamar a `hilo.join()` en los 4 hilos trabajadores desde 'main'",
+                    "Llamar a `main.join()` desde los hilos trabajadores",
+                    "Usar `wait()` en el hilo 'main'",
+                    "Usar `synchronized` en el hilo 'main'"
+                ],
+                correct: 0,
+                explanation: "main llamará a join() en cada uno de los 4 hilos. Se bloqueará en el primero, esperará a que muera, luego en el segundo, etc., garantizando que los 4 han terminado."
+            },
+            {
+                id: 7,
+                scenario: "Tienes una bandera booleana (`terminar`) que es modificada por un hilo y leída continuamente por otro hilo en un bucle (`while(!terminar)`). El bucle lector no detecta el cambio de valor.",
+                options: [
+                    "Envolver el bucle lector en un bloque `try-catch`",
+                    "Declarar la variable `terminar` como `volatile`",
+                    "Usar `Thread.sleep(1)` en el bucle lector",
+                    "Usar `ProcessBuilder`"
+                ],
+                correct: 1,
+                explanation: "Este es un problema de visibilidad. La palabra clave `volatile` asegura que el valor de la variable `terminar` se lea directamente de la memoria principal, forzando que el cambio sea visible para el hilo lector."
+            },
+            {
+                id: 8,
+                scenario: "Necesitas ejecutar un proceso de cálculo intensivo y quieres que, al finalizar, devuelva un objeto de resultado específico. El hilo principal debe esperar por este objeto.",
+                options: [
+                    "Implementar `Callable<T>` con un `ExecutorService` y obtener el resultado con `Future<T>.get()`",
+                    "Usar el método `Thread.run()` para ejecutar el cálculo",
+                    "Usar `hilo.join()` en un hilo implementado con `Runnable`",
+                    "Usar un candado `ReentrantLock` para la tarea de cálculo"
+                ],
+                correct: 0,
+                explanation: "Runnable no devuelve valor. Callable es la interfaz diseñada para tareas que se ejecutan asíncronamente y deben devolver un valor. Future.get() es el mecanismo para recuperar ese valor de forma bloqueante cuando está listo."
+            },
+            {
+                id: 9,
+                scenario: "Estás diseñando un método para reservar un recurso compartido (ej. un asiento). El método requiere múltiples pasos (verificar, restar, confirmar) que deben ser atómicos (ininterrumpibles por otros hilos).",
+                options: [
+                    "Usar `AtomicBoolean` para la confirmación",
+                    "Envolver toda la lógica de reserva en un bloque `synchronized`",
+                    "Declarar todas las variables como `volatile`",
+                    "Usar un `CountDownLatch`"
+                ],
+                correct: 1,
+                explanation: "El bloque `synchronized` es el mecanismo estándar para la exclusión mutua, garantizando que solo un hilo pueda ejecutar la sección crítica (los pasos de la reserva) a la vez, asegurando atomicidad de la operación compuesta."
+            },
+            {
+                id: 10,
+                scenario: "Necesitas ejecutar un comando externo que ocasionalmente lanza advertencias o errores en su flujo de error (`stderr`). Quieres capturar y registrar solo el contenido del `stderr`.",
+                options: [
+                    "Usar `ProcessBuilder` y leer el contenido de `process.getInputStream()`",
+                    "Usar `builder.redirectErrorStream(true)` y luego leer de `getInputStream()`",
+                    "Usar `ProcessBuilder` y leer el contenido de `process.getErrorStream()`",
+                    "Usar `builder.inheritIO()`"
+                ],
+                correct: 2,
+                explanation: "Por defecto, la salida de error (stderr) del proceso hijo se lee desde el stream de error del objeto Process en Java (`process.getErrorStream()`)."
+            }
+        ];
+        
+        let currentCardIndex = 0;
+        let testAnswers = {};
+        
+        // FLASHCARD FUNCTIONS
+        function showCard(index) {
+            if (!flashcards.length) return;
+            document.getElementById('card-front').textContent = flashcards[index].front;
+            document.getElementById('card-back').textContent = flashcards[index].back;
+            document.getElementById('current-card').textContent = index + 1;
+            document.getElementById('total-cards').textContent = flashcards.length;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+        
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+        
+        function nextCard() {
+            if (!flashcards.length) return;
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            showCard(currentCardIndex);
+        }
+        
+        function prevCard() {
+            if (!flashcards.length) return;
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            showCard(currentCardIndex);
+        }
+        
+        // TEST GENERAL FUNCTIONS
+        function renderTestQuestions() {
+            const container = document.getElementById('test-questions');
+            if (!container) return;
+            testQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <h3>Pregunta ${index + 1}</h3>
+                    <p style="margin-bottom: 15px; font-weight: 500;">${q.question}</p>
+                    <div class="options" id="test-options-${q.id}">
+                        ${q.options.map((opt, i) => `
+                            <div class="option" onclick="selectTestOption(${q.id}, ${i})">
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            });
+        }
+        
+        function selectTestOption(questionId, optionIndex) {
+            testAnswers[questionId] = optionIndex;
+            const optionsDiv = document.getElementById(`test-options-${questionId}`);
+            const options = optionsDiv.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.classList.remove('selected');
+                if (i === optionIndex) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+        
+        function submitTest() {
+            if (Object.keys(testAnswers).length < testQuestions.length) {
+                alert(`Has respondido ${Object.keys(testAnswers).length} de ${testQuestions.length} preguntas. Por favor, responde todas antes de enviar.`);
+                return;
+            }
+            
+            let correct = 0;
+            testQuestions.forEach(q => {
+                const optionsDiv = document.getElementById(`test-options-${q.id}`);
+                const options = optionsDiv.querySelectorAll('.option');
+                const userAnswer = testAnswers[q.id];
+                
+                options.forEach((opt, i) => {
+                    opt.onclick = null;
+                    if (i === q.correct) {
+                        opt.classList.add('correct');
+                    } else if (i === userAnswer && i !== q.correct) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+                
+                if (userAnswer === q.correct) {
+                    correct++;
+                }
+            });
+            
+            const percentage = ((correct / testQuestions.length) * 100).toFixed(1);
+            const resultDiv = document.getElementById('test-result');
+            const passed = percentage >= 50;
+            
+            resultDiv.className = passed ? 'test-result' : 'test-result fail';
+            resultDiv.innerHTML = `
+                <h2>${passed ? '¡Aprobado! 🎉' : 'Necesitas repasar 📚'}</h2>
+                <p style="font-size: 1.5em; margin: 10px 0;">${correct} / ${testQuestions.length} correctas</p>
+                <p style="font-size: 1.2em;">${percentage}%</p>
+                <p style="margin-top: 15px;">
+                    ${percentage >= 90 ? 'Excelente dominio del temario' :
+                      percentage >= 70 ? 'Buen conocimiento, repasa algunos puntos' :
+                      percentage >= 50 ? 'Aprobado, pero estudia más los temas fallados' :
+                      'Repasa el temario completo y vuelve a intentarlo'}
+                </p>
+            `;
+            resultDiv.style.display = 'block';
+            
+            window.scrollTo({ top: document.getElementById('test').offsetTop, behavior: 'smooth' });
+        }
+        
+        // CODE QUESTIONS FUNCTIONS
+        function renderCodeQuestions() {
+            const container = document.getElementById('code-questions');
+            if (!container) return;
+            codeQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                // Usamos replace con regex global para escapar todos los < y > en el bloque de código
+                const safeCode = q.code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                questionDiv.innerHTML = `
+                    <h3>Pregunta ${index + 1}: ${q.question}</h3>
+                    <div class="code-block"><pre><code>${safeCode}</code></pre></div>
+                    <div class="options" id="code-options-${q.id}">
+                        ${q.options.map((opt, i) => `
+                            <div class="option" onclick="selectCodeOption(${q.id}, ${i}, ${q.correct})">
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="code-explanation-${q.id}" style="display: none;"></div>
+                `;
+                container.appendChild(questionDiv);
+            });
+        }
+        
+        function selectCodeOption(questionId, selected, correct) {
+            const optionsDiv = document.getElementById(`code-options-${questionId}`);
+            const options = optionsDiv.querySelectorAll('.option');
+            const explanationDiv = document.getElementById(`code-explanation-${questionId}`);
+            
+            options.forEach((opt, i) => {
+                opt.onclick = null;
+                if (i === correct) {
+                    opt.classList.add('correct');
+                } else if (i === selected && i !== correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            const question = codeQuestions.find(q => q.id === questionId);
+            if (selected === correct) {
+                explanationDiv.className = 'success-box';
+                explanationDiv.innerHTML = `<strong>✅ ¡Correcto!</strong><br><br>${question.explanation}`;
+            } else {
+                explanationDiv.className = 'explanation';
+                explanationDiv.innerHTML = `<strong>❌ Incorrecto</strong><br><br><strong>Explicación:</strong> ${question.explanation}`;
+            }
+            explanationDiv.style.display = 'block';
+        }
+        
+        // PRACTICAL CASES FUNCTIONS
+        function renderPracticalCases() {
+            const container = document.getElementById('practical-cases');
+            if (!container) return;
+            practicalCases.forEach((c, index) => {
+                const caseDiv = document.createElement('div');
+                caseDiv.className = 'question';
+                caseDiv.innerHTML = `
+                    <h3>Caso ${index + 1}</h3>
+                    <p style="margin-bottom: 15px;">${c.scenario}</p>
+                    <div class="options" id="practical-options-${c.id}">
+                        ${c.options.map((opt, i) => `
+                            <div class="option" onclick="selectPracticalOption(${c.id}, ${i}, ${c.correct}, \`${c.explanation.replace(/`/g, '\\`')}\`)">
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="practical-explanation-${c.id}" style="display: none;"></div>
+                `;
+                container.appendChild(caseDiv);
+            });
+        }
+        
+        function selectPracticalOption(caseId, selected, correct, explanation) {
+            const optionsDiv = document.getElementById(`practical-options-${caseId}`);
+            const options = optionsDiv.querySelectorAll('.option');
+            const explanationDiv = document.getElementById(`practical-explanation-${caseId}`);
+            
+            options.forEach((opt, i) => {
+                opt.onclick = null;
+                if (i === correct) {
+                    opt.classList.add('correct');
+                } else if (i === selected && i !== correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (selected === correct) {
+                explanationDiv.className = 'success-box';
+                explanationDiv.innerHTML = `<strong>✅ ¡Correcto!</strong><br><br><strong>Explicación:</strong> ${explanation}`;
+            } else {
+                explanationDiv.className = 'warning-box';
+                explanationDiv.innerHTML = `<strong>💡 Revisa la explicación:</strong><br><br>${explanation}`;
+            }
+            explanationDiv.style.display = 'block';
+        }
+        
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            // Asegurarse de que event.target existe o usar el botón correspondiente
+            const activeButton = Array.from(buttons).find(btn => btn.getAttribute('onclick') === `showTab('${tabName}')`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            } else if (event && event.target) {
+                 event.target.classList.add('active');
+            } else {
+                buttons[0].classList.add('active'); // fallback
+            }
+        }
+        
+        // INITIALIZE
+        // Envolver la inicialización en DOMContentLoaded para asegurar que los elementos existen
+        document.addEventListener('DOMContentLoaded', () => {
+            showCard(0);
+            renderTestQuestions();
+            renderCodeQuestions();
+            renderPracticalCases();
+            
+            // Activar la primera pestaña por defecto
+            showTab('test');
+        });
+    </script>
+</body>
+</html>
