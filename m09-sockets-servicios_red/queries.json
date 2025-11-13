@@ -1,0 +1,177 @@
+{
+	"info": {
+		"_postman_id": "7668b5a0-52a1-42a1-9447-386d888358e0",
+		"name": "M09 - Tareas Pendientes (Spring Boot)",
+		"description": "Colección para probar los 6 Endpoints de la API REST de Tareas Pendientes desarrollada en Java/Spring Boot (TodoApplication.java).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_collection_id": "7668b5a0-52a1-42a1-9447-386d888358e0"
+	},
+	"item": [
+		{
+			"name": "1. POST - Crear Nueva Tarea",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"descripcion\": \"Configurar el entorno de desarrollo y Maven\",\n    \"completada\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tareas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas"
+					]
+				},
+				"description": "Crea una nueva tarea. Usar este endpoint primero para obtener un ID (ej: 1)."
+			},
+			"response": []
+		},
+		{
+			"name": "2. GET - Obtener TODAS las Tareas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas"
+					]
+				},
+				"description": "Recupera la lista completa de tareas pendientes."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET - Obtener Tarea por ID (ej: 1)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas",
+						"1"
+					]
+				},
+				"description": "Recupera una tarea específica usando su ID."
+			},
+			"response": []
+		},
+		{
+			"name": "4. PUT - Actualización COMPLETA (ID: 1)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"descripcion\": \"¡Tengo que enviar el informe final antes del viernes!\",\n    \"completada\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas",
+						"1"
+					]
+				},
+				"description": "Reemplaza completamente la tarea con ID 1. Debe incluir el ID en el body."
+			},
+			"response": []
+		},
+		{
+			"name": "5. PATCH - Actualización Parcial (Cambiar estado ID: 1)",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1/completada?estado=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas",
+						"1",
+						"completada"
+					],
+					"query": [
+						{
+							"key": "estado",
+							"value": "false"
+						}
+					]
+				},
+				"description": "Actualiza solo el estado 'completada' usando un Query Parameter (?estado=true/false)."
+			},
+			"response": []
+		},
+		{
+			"name": "6. DELETE - Eliminar Tarea (ID: 1)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tareas/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tareas",
+						"1"
+					]
+				},
+				"description": "Elimina la tarea con ID 1. Debería devolver 204 No Content."
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

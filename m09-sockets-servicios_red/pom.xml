@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- 
+        Dependencia principal de Spring Boot. 
+        Esto gestiona automáticamente las versiones de las librerías.
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.1</version> <!-- Versión actual de Spring Boot -->
+        <relativePath/> <!-- Busca el parent desde el repositorio central -->
+    </parent>
+    
+    <groupId>com.example</groupId>
+    <artifactId>m09-sockets-servicios_red</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>m09-sockets-servicios_red</name>
+    <description>Proyecto de ejemplo para servicios de red y API REST con Spring Boot</description>
+    
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+    
+    <dependencies>
+        <!-- 
+            Dependencia necesaria para construir aplicaciones web RESTful.
+            Incluye Tomcat, Spring MVC y Jackson (para JSON).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 
+            Dependencia de desarrollo (opcional pero muy útil). 
+            Permite reiniciar la aplicación automáticamente al detectar cambios.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Dependencia de prueba básica -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin para empaquetar y ejecutar la aplicación Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
